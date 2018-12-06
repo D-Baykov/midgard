@@ -1,10 +1,9 @@
 package com.rbkmoney.midgard.helpers;
 
-import com.rbkmoney.midgard.Bank;
+import com.rbkmoney.midgard.data.enums.Bank;
 import com.rbkmoney.midgard.DAO.TransactionsDAO;
 import com.rbkmoney.midgard.utils.MidgardUtils;
 import org.jooq.generated.enums.CtState;
-import org.jooq.generated.enums.TransactionClearingState;
 import org.jooq.generated.tables.pojos.ClearingTransactionInfo;
 import org.jooq.generated.tables.pojos.FailureTransaction;
 import org.jooq.generated.tables.pojos.ClearingTransaction;
@@ -16,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.jooq.generated.enums.TransactionClearingState.*;
 import static org.jooq.generated.enums.TransactionClearingState.ACTIVE;
 import static org.jooq.generated.enums.TransactionClearingState.FAILED;
 
@@ -119,13 +117,20 @@ public class TransactionHelper {
         dao.saveClearingTransactionInfo(transactionInfo);
     }
 
-    public void updateClearingTransactionsToActiveState(List<ClearingTransaction> transactions, Long clearingId) {
+    public void updateClearingTransactionsState(List<ClearingTransaction> activeTrx,
+                                                List<ClearingTransaction> failedTrx,
+                                                Long clearingId) {
+        updateClearingTransactionsToActiveState(activeTrx, clearingId);
+        updateClearingTransactionsToFailedState(failedTrx, clearingId);
+    }
+
+    private void updateClearingTransactionsToActiveState(List<ClearingTransaction> transactions, Long clearingId) {
         for (ClearingTransaction transaction : transactions) {
             dao.setClearingTransactionMetaInfo(transaction.getTransactionId(), clearingId, ACTIVE);
         }
     }
 
-    public void updateClearingTransactionsToFailedState(List<ClearingTransaction> transactions, Long clearingId) {
+    private void updateClearingTransactionsToFailedState(List<ClearingTransaction> transactions, Long clearingId) {
         for (ClearingTransaction transaction : transactions) {
             dao.setClearingTransactionMetaInfo(transaction.getTransactionId(), clearingId, FAILED);
         }

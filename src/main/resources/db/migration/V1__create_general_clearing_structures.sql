@@ -417,9 +417,12 @@ CREATE TABLE midgard.config (
 INSERT INTO midgard.config (name, value, comment)
 VALUES ('last_event_id', '1', 'ID последнего полученного эвента');
 
+INSERT INTO midgard.config (name, value, comment)
+VALUES ('mts.clearing_state', '1', 'Возможность выполнения клиринга для МТС банка');
+
 
 /***************************************************************************/
-CREATE TYPE midgard.clearing_state AS ENUM ('STARTED', 'SUCCESSFULLY', 'FAILED');
+CREATE TYPE midgard.clearing_state AS ENUM ('STARTED', 'EXECUTE', 'SUCCESSFULLY', 'FAILED');
 
 CREATE TABLE midgard.clearing_event (
   id           BIGSERIAL                     NOT NULL,
@@ -451,7 +454,7 @@ CREATE TABLE midgard.failure_transaction (
   transaction_id         VARCHAR(100)                  NOT NULL,
   act_time               TIMESTAMP WITHOUT TIME ZONE   NOT NULL DEFAULT (now() at time zone 'utc'),
   reason                 VARCHAR(500)                  NULL,
-  CONSTRAINT failure_transaction_PK PRIMARY KEY (bank_name, act_time, transaction_id)
+  CONSTRAINT failure_transaction_PK PRIMARY KEY (clearing_id, transaction_id)
 );
 
 CREATE INDEX failure_transaction_idx ON midgard.failure_transaction (transaction_id);

@@ -1,6 +1,6 @@
 package com.rbkmoney.midgard.DAO;
 
-import com.rbkmoney.midgard.Bank;
+import com.rbkmoney.midgard.data.enums.Bank;
 import com.rbkmoney.midgard.DAO.common.AbstractGenericDao;
 import com.rbkmoney.midgard.DAO.common.RecordRowMapper;
 import org.jooq.Query;
@@ -70,6 +70,13 @@ public class ClearingInfoDAO extends AbstractGenericDao<ClearingEvent> {
                 .limit(1);
         ClearingEvent event = fetchOne(query, clearingEventsRowMapper);
         return event.getId();
+    }
+
+    public void updateClearingState(Long clearingId, ClearingState state) {
+        Query query = getDslContext().update(CLEARING_EVENT)
+                .set(CLEARING_EVENT.STATE, state)
+                .where(CLEARING_EVENT.ID.eq(clearingId));
+        execute(query);
     }
 
 }

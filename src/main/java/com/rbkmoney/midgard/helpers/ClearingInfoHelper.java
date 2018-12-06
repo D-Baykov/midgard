@@ -1,7 +1,8 @@
 package com.rbkmoney.midgard.helpers;
 
-import com.rbkmoney.midgard.Bank;
+import com.rbkmoney.midgard.data.enums.Bank;
 import com.rbkmoney.midgard.DAO.ClearingInfoDAO;
+import org.jooq.generated.enums.ClearingState;
 import org.jooq.generated.tables.pojos.ClearingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,18 @@ public class ClearingInfoHelper {
 
     public ClearingEvent getClearingEvent(Long eventId) {
         return dao.get(String.valueOf(eventId));
+    }
+
+    public void setExecutedClearingEvent(Long clearingId) {
+        dao.updateClearingState(clearingId, ClearingState.EXECUTE);
+    }
+
+    public void setSuccessClearingEvent(Long clearingId) {
+        dao.updateClearingState(clearingId, ClearingState.SUCCESSFULLY);
+    }
+
+    public void setFailedClearingEvent(Long clearingId) {
+        dao.updateClearingState(clearingId, ClearingState.FAILED);
     }
 
 }

@@ -1,6 +1,10 @@
 package com.rbkmoney.midgard.utils;
 
+import org.apache.commons.io.FileUtils;
 import org.jooq.generated.tables.pojos.ClearingTransaction;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Utility class for working with clearing objects
@@ -108,6 +112,10 @@ public final class MidgardUtils {
         }
 
         return true;
+    }
+
+    public static final void saveToFile(String fileName, String value) throws IOException {
+        FileUtils.writeStringToFile(new File(fileName), value);
     }
 
     private MidgardUtils() { }

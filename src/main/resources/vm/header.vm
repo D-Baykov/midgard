@@ -1,4 +1,4 @@
-#* @vtlvariable name="header" type="com.rbkmoney.midgard.utils.MtsXmlHeader" *#
+#* @vtlvariable name="header" type="com.rbkmoney.midgard.data.MtsXmlHeader" *#
 <Header>
     <FormatVersion>$header.formatVersion</FormatVersion>
     <FileOriginator>$header.fileOriginator</FileOriginator>

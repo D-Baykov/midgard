@@ -1,4 +1,4 @@
-package com.rbkmoney.midgard;
+package com.rbkmoney.midgard.data.enums;
 
 public enum Bank {
 

@@ -1,15 +1,24 @@
 package com.rbkmoney.midgard.upload.commands;
 
-import com.rbkmoney.midgard.Bank;
+import com.rbkmoney.midgard.data.ClearingData;
+import com.rbkmoney.midgard.data.MtsXmlHeader;
+import com.rbkmoney.midgard.data.enums.Bank;
 import com.rbkmoney.midgard.helpers.ClearingInfoHelper;
 import com.rbkmoney.midgard.helpers.MerchantHelper;
 import com.rbkmoney.midgard.helpers.TransactionHelper;
+import com.rbkmoney.midgard.pojos.CardData;
 import com.rbkmoney.midgard.pojos.ClearingInstruction;
+import com.rbkmoney.midgard.utils.MidgardUtils;
+import com.rbkmoney.midgard.utils.MtsXmlUtil;
+import com.rbkmoney.midgard.utils.VelocityUtil;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.tools.generic.DateTool;
 import org.jooq.generated.tables.pojos.ClearingTransaction;
 import org.jooq.generated.tables.pojos.Merchant;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StartTransactionsClearingCommand implements Command {
@@ -67,22 +76,67 @@ public class StartTransactionsClearingCommand implements Command {
         transactionHelper.saveAllFailureTransactionByOneReason(failedTransactions, clearingId, reason);
 
         // записать историю выгрузки транзакций в таблицу clearing_transaction_info
-        transactionHelper.saveSentClearingTransactionsInfo(transactions, clearingId);
-        transactionHelper.saveRefusedClearingTransactionsInfo(failedTransactions, clearingId);
+        transactionHelper.saveClearingTransactionsInfo(transactions, failedTransactions, clearingId);
 
-        //TODO: обновить статусы успешных/неуспешных транзакций в таблице clearing_transaction
+        // обновить статусы успешных/неуспешных транзакций в таблице clearing_transaction
+        transactionHelper.updateClearingTransactionsState(transactions, failedTransactions, clearingId);
 
+        // обновить статус клиринга
+        clearingInfoHelper.setExecutedClearingEvent(clearingId);
 
-        //TODO: обновить статус клиринга
+        // сформировать объект для передачи в адаптер формирования XML клиринга
+        ClearingData clearingData = new ClearingData(transactions, merchants);
 
+        // отправить объект в адаптер
+        sendData(clearingData);
 
-        //TODO: сформировать объект для передачи в адаптер формирования XML клиринга
-
-
-        //TODO: отправить объект в адаптер
-
-
+        createXml(clearingData);
     }
 
+    private void sendData(ClearingData clearingData) {
+        //TODO: отправка данных в адаптер формирования XML
+    }
+
+    //
+    private void createXml(ClearingData clearingData) {
+        String fileOriginator = "fileOriginator";
+        int fileNumber = 1;
+        MtsXmlHeader header = new MtsXmlHeader(fileOriginator, fileNumber);
+        VelocityContext headerContext = new VelocityContext();
+        headerContext.put("header", header);
+        String clearingXmlHeader = VelocityUtil.create("vm/header.vm", headerContext);
+
+
+        DateTool dateTool = new DateTool();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        String procDate = dateFormat.format(new Date());
+        String msgNr = UUID.randomUUID().toString();
+        List<ClearingTransaction> transactions = clearingData.getTransactions();
+        List<Merchant> merchants = clearingData.getMerchants();
+
+        List<VelocityContext> transactionsContext = new ArrayList<>();
+        for (ClearingTransaction transaction : transactions) {
+            VelocityContext context = new VelocityContext();
+            CardData cardData = new CardData();
+            context.put("dateTool", dateTool);
+            context.put("procDate", procDate);
+            context.put("msgNr", msgNr);
+            context.put("cardData", cardData);
+            context.put("transaction", transaction);
+            Merchant merchant = merchants.stream()
+                    .filter(mrch -> mrch.getMerchantId().equals(transaction.getMerchantId()))
+                    .findFirst().orElse(new Merchant());
+            context.put("merchant", merchant);
+            transactionsContext.add(context);
+        }
+        List<String> trxXmlBlocks = VelocityUtil.create("vm/transaction.vm", transactionsContext);
+
+        try {
+            MidgardUtils.saveToFile("clearing.xml", MtsXmlUtil.createXML(clearingXmlHeader, trxXmlBlocks));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }

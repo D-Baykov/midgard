@@ -1,4 +1,4 @@
-package com.rbkmoney.midgard.utils;
+package com.rbkmoney.midgard.data;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

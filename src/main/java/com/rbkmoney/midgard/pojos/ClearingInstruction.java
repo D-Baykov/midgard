@@ -1,6 +1,6 @@
 package com.rbkmoney.midgard.pojos;
 
-import com.rbkmoney.midgard.Bank;
+import com.rbkmoney.midgard.data.enums.Bank;
 
 import java.util.Date;
 

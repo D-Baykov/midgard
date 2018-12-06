@@ -1,6 +1,6 @@
 package com.rbkmoney.midgard.DAO;
 
-import com.rbkmoney.midgard.Bank;
+import com.rbkmoney.midgard.data.enums.Bank;
 import com.rbkmoney.midgard.DAO.common.AbstractGenericDao;
 import com.rbkmoney.midgard.DAO.common.RecordRowMapper;
 import org.jooq.Query;
@@ -18,10 +18,8 @@ import org.springframework.jdbc.core.RowMapper;
 import javax.sql.DataSource;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
-import static org.jooq.generated.enums.TransactionClearingState.*;
 import static org.jooq.generated.tables.ClearingTransaction.CLEARING_TRANSACTION;
 import static org.jooq.generated.tables.ClearingTransactionInfo.CLEARING_TRANSACTION_INFO;
 import static org.jooq.generated.tables.FailureTransaction.*;
