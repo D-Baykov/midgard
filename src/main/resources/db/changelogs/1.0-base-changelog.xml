@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.2.xsd">
+
+    <changeSet id="1.0-base-create-transaction-state-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="transaction_state">
+            <column name="id" type="int">
+                <constraints primaryKeyName="transaction_state_PK" primaryKey="true" />
+            </column>
+            <column name="state_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.transaction_state VALUES (1, 'READY');
+            INSERT INTO midgard.transaction_state VALUES (2, 'ACTIVE');
+            INSERT INTO midgard.transaction_state VALUES (3, 'FINISHED');
+            INSERT INTO midgard.transaction_state VALUES (4, 'FAILED');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-account-type-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="account_type">
+            <column name="id" type="varchar(2)">
+                <constraints primaryKeyName="account_type_PK" primaryKey="true" />
+            </column>
+            <column name="type_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.account_type VALUES ('00', 'Default – unspecified');
+            INSERT INTO midgard.account_type VALUES ('10', 'Savings account');
+            INSERT INTO midgard.account_type VALUES ('20', 'Check account');
+            INSERT INTO midgard.account_type VALUES ('30', 'Credit facility');
+            INSERT INTO midgard.account_type VALUES ('40', 'Universal account');
+            INSERT INTO midgard.account_type VALUES ('50', 'Investment account');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-transaction-type-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="transaction_type">
+            <column name="id" type="varchar(2)">
+                <constraints primaryKeyName="transaction_type_PK" primaryKey="true" />
+            </column>
+            <column name="type_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.transaction_type VALUES ('00', 'Goods &amp; service (Purchase)');
+            INSERT INTO midgard.transaction_type VALUES ('01', 'Cash');
+            INSERT INTO midgard.transaction_type VALUES ('02', 'Debit adjustment');
+            INSERT INTO midgard.transaction_type VALUES ('09', 'Purchase with cashback');
+            INSERT INTO midgard.transaction_type VALUES ('10', 'P2P Debit');
+            INSERT INTO midgard.transaction_type VALUES ('11', 'Quasi-cash');
+            INSERT INTO midgard.transaction_type VALUES ('12', 'Manual cash');
+            INSERT INTO midgard.transaction_type VALUES ('20', 'Returns (refund)');
+            INSERT INTO midgard.transaction_type VALUES ('21', 'Deposits');
+            INSERT INTO midgard.transaction_type VALUES ('22', 'Credit adjustment');
+            INSERT INTO midgard.transaction_type VALUES ('26', 'P2P Credit');
+            INSERT INTO midgard.transaction_type VALUES ('31', 'Balance inquiry');
+            INSERT INTO midgard.transaction_type VALUES ('37', 'Mini-statement');
+            INSERT INTO midgard.transaction_type VALUES ('38', 'Mini-statement ');
+            INSERT INTO midgard.transaction_type VALUES ('39', 'Mini-statement ');
+            INSERT INTO midgard.transaction_type VALUES ('50', 'Payment');
+            INSERT INTO midgard.transaction_type VALUES ('51', 'Payment');
+            INSERT INTO midgard.transaction_type VALUES ('52', 'Payment');
+            INSERT INTO midgard.transaction_type VALUES ('70', 'PIN change');
+            INSERT INTO midgard.transaction_type VALUES ('19', 'Fee Collection (Credit to Transaction Originator)');
+            INSERT INTO midgard.transaction_type VALUES ('29', 'Fee Collection (Debit to Transaction Originator)');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-card-data-input-cap-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="card_data_input_capability">
+            <column name="id" type="varchar(1)">
+                <constraints primaryKeyName="card_data_input_capability_PK" primaryKey="true" />
+            </column>
+            <column name="card_data_input_cap_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.card_data_input_capability VALUES ('0', 'Unknown');
+            INSERT INTO midgard.card_data_input_capability VALUES ('1', 'Manual, no terminal');
+            INSERT INTO midgard.card_data_input_capability VALUES ('2', 'Magnetic stripe read');
+            INSERT INTO midgard.card_data_input_capability VALUES ('3', 'Barcode');
+            INSERT INTO midgard.card_data_input_capability VALUES ('4', 'OCR');
+            INSERT INTO midgard.card_data_input_capability VALUES ('5', 'ICC');
+            INSERT INTO midgard.card_data_input_capability VALUES ('6', 'key entered');
+            INSERT INTO midgard.card_data_input_capability VALUES ('A', 'Contactless magnetic stripe');
+            INSERT INTO midgard.card_data_input_capability VALUES ('B', 'Magnetic stripe read + key entry');
+            INSERT INTO midgard.card_data_input_capability VALUES ('C', 'Magnetic stripe read + ICC + key entry');
+            INSERT INTO midgard.card_data_input_capability VALUES ('D', 'Magnetic stripe read + ICC');
+            INSERT INTO midgard.card_data_input_capability VALUES ('E', 'ICC+ key entry');
+            INSERT INTO midgard.card_data_input_capability VALUES ('M', 'Contactless ICC');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-card-data-input-mode-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="card_data_input_mode">
+            <column name="id" type="varchar(1)">
+                <constraints primaryKeyName="card_data_input_mode_PK" primaryKey="true" />
+            </column>
+            <column name="card_data_input_mode_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.card_data_input_mode VALUES ('0', 'Unspecified');
+            INSERT INTO midgard.card_data_input_mode VALUES ('1', 'Manual, no terminal');
+            INSERT INTO midgard.card_data_input_mode VALUES ('2', 'Magnetic stripe read');
+            INSERT INTO midgard.card_data_input_mode VALUES ('3', 'Bar code');
+            INSERT INTO midgard.card_data_input_mode VALUES ('4', 'OCR');
+            INSERT INTO midgard.card_data_input_mode VALUES ('5', 'ICC');
+            INSERT INTO midgard.card_data_input_mode VALUES ('6', 'Key entered');
+            INSERT INTO midgard.card_data_input_mode VALUES ('7', 'ICC, CVV may not be checked');
+            INSERT INTO midgard.card_data_input_mode VALUES ('8', 'ICC fallback to mag.stripe');
+            INSERT INTO midgard.card_data_input_mode VALUES ('9', 'Full magnetic stripe read');
+            INSERT INTO midgard.card_data_input_mode VALUES ('A', 'Contactless magnetic-stripe read');
+            INSERT INTO midgard.card_data_input_mode VALUES ('J', 'Credential On File');
+            INSERT INTO midgard.card_data_input_mode VALUES ('M', 'Contactless smart card read');
+            INSERT INTO midgard.card_data_input_mode VALUES ('N', 'Contactless input, PayPass Mapping Service applied');
+            INSERT INTO midgard.card_data_input_mode VALUES ('R', 'PAN Entry via electronic commerce, including remote chip E - e-commerce');
+            INSERT INTO midgard.card_data_input_mode VALUES ('W', 'PAN Auto Entry via Server');
+            INSERT INTO midgard.card_data_input_mode VALUES ('Y', 'PAN Auto Entry via Server, Card on File service applied');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-card-data-output-cap-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="card_data_output_capability">
+            <column name="id" type="varchar(1)">
+                <constraints primaryKeyName="card_data_output_capability_PK" primaryKey="true" />
+            </column>
+            <column name="card_data_output_cap_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.card_data_output_capability VALUES ('0', 'Unknown; data unavailable');
+            INSERT INTO midgard.card_data_output_capability VALUES ('1', 'None');
+            INSERT INTO midgard.card_data_output_capability VALUES ('2', 'Magnetic stripe write');
+            INSERT INTO midgard.card_data_output_capability VALUES ('3', 'ICC');
+            INSERT INTO midgard.card_data_output_capability VALUES ('S', 'Other');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-cardholder-auth-cap-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="cardholder_auth_capability">
+            <column name="id" type="varchar(1)">
+                <constraints primaryKeyName="cardholder_auth_capability_PK" primaryKey="true" />
+            </column>
+            <column name="cardholder_auth_cap_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.cardholder_auth_capability VALUES ('0', 'no electronic authentication');
+            INSERT INTO midgard.cardholder_auth_capability VALUES ('1', 'PIN');
+            INSERT INTO midgard.cardholder_auth_capability VALUES ('2', 'Electronic signature analysis');
+            INSERT INTO midgard.cardholder_auth_capability VALUES ('3', 'Biometrics');
+            INSERT INTO midgard.cardholder_auth_capability VALUES ('4', 'Biographic');
+            INSERT INTO midgard.cardholder_auth_capability VALUES ('5', 'Electronic authentication inoperative');
+            INSERT INTO midgard.cardholder_auth_capability VALUES ('6', 'Other');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-cardholder-auth-entity-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="cardholder_auth_entity">
+            <column name="id" type="varchar(1)">
+                <constraints primaryKeyName="cardholder_auth_entity_PK" primaryKey="true" />
+            </column>
+            <column name="cardholder_auth_entity_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.cardholder_auth_entity VALUES ('0', 'not authenticated');
+            INSERT INTO midgard.cardholder_auth_entity VALUES ('1', 'ICC');
+            INSERT INTO midgard.cardholder_auth_entity VALUES ('2', 'CAD');
+            INSERT INTO midgard.cardholder_auth_entity VALUES ('3', 'Authorizing agent');
+            INSERT INTO midgard.cardholder_auth_entity VALUES ('4', 'By merchant');
+            INSERT INTO midgard.cardholder_auth_entity VALUES ('5', 'Other');
+            INSERT INTO midgard.cardholder_auth_entity VALUES ('9', 'Unknown');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-cardholder-auth-method-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="cardholder_auth_method">
+            <column name="id" type="varchar(1)">
+                <constraints primaryKeyName="cardholder_auth_method_PK" primaryKey="true" />
+            </column>
+            <column name="cardholder_auth_method_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.cardholder_auth_method VALUES ('0', 'Not authenticated');
+            INSERT INTO midgard.cardholder_auth_method VALUES ('1', 'PIN');
+            INSERT INTO midgard.cardholder_auth_method VALUES ('2', 'Electronic signature analysis');
+            INSERT INTO midgard.cardholder_auth_method VALUES ('3', 'Biometrics');
+            INSERT INTO midgard.cardholder_auth_method VALUES ('4', 'Biographic');
+            INSERT INTO midgard.cardholder_auth_method VALUES ('5', 'Manual signature verification');
+            INSERT INTO midgard.cardholder_auth_method VALUES ('6', 'Other manual verification');
+            INSERT INTO midgard.cardholder_auth_method VALUES ('9', 'Unknown');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-cardholder-presence-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="cardholder_presence">
+            <column name="id" type="varchar(1)">
+                <constraints primaryKeyName="cardholder_presence_PK" primaryKey="true" />
+            </column>
+            <column name="cardholder_presence_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.cardholder_presence VALUES ('0', 'Cardholder present');
+            INSERT INTO midgard.cardholder_presence VALUES ('1', 'Cardholder not present, unspecified');
+            INSERT INTO midgard.cardholder_presence VALUES ('2', 'Cardholder not present, mail order');
+            INSERT INTO midgard.cardholder_presence VALUES ('3', 'Cardholder not present, telephone');
+            INSERT INTO midgard.cardholder_presence VALUES ('4', 'Cardholder not present, standing authorization');
+            INSERT INTO midgard.cardholder_presence VALUES ('5', 'Cardholder not present, u-commerce');
+            INSERT INTO midgard.cardholder_presence VALUES ('9', 'Unknown');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-msg-fun-code-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="message_function_code">
+            <column name="code" type="int">
+                <constraints primaryKeyName="message_function_code_PK" primaryKey="true" />
+            </column>
+            <column name="message_function_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.message_function_code VALUES (100, 'Original authorization');
+            INSERT INTO midgard.message_function_code VALUES (102, 'Replacement authorization');
+            INSERT INTO midgard.message_function_code VALUES (104, 'Resubmission');
+            INSERT INTO midgard.message_function_code VALUES (106, 'Supplementary authorization');
+            INSERT INTO midgard.message_function_code VALUES (108, 'Inquiry');
+            INSERT INTO midgard.message_function_code VALUES (200, 'Original financial request/advice');
+            INSERT INTO midgard.message_function_code VALUES (201, 'Previously approved authorization — amount same');
+            INSERT INTO midgard.message_function_code VALUES (202, 'Previously approved authorization — amount differs');
+            INSERT INTO midgard.message_function_code VALUES (203, 'Resubmission of a previously denied financial request');
+            INSERT INTO midgard.message_function_code VALUES (204, 'Resubmission of a previously reversed financial transaction');
+            INSERT INTO midgard.message_function_code VALUES (205, 'First representment, full');
+            INSERT INTO midgard.message_function_code VALUES (206, 'Second representment, full');
+            INSERT INTO midgard.message_function_code VALUES (207, 'Third or subsequent representment, full');
+            INSERT INTO midgard.message_function_code VALUES (211, 'First representment partial amount');
+            INSERT INTO midgard.message_function_code VALUES (212, 'Second representment partial amount');
+            INSERT INTO midgard.message_function_code VALUES (213, 'Third or subsequent representment partial amount');
+            INSERT INTO midgard.message_function_code VALUES (280, 'First representment reversal, full');
+            INSERT INTO midgard.message_function_code VALUES (281, 'Second representment reversal, full');
+            INSERT INTO midgard.message_function_code VALUES (282, 'Third or subsequent representment reversal, full');
+            INSERT INTO midgard.message_function_code VALUES (283, 'First representment reversal, partial');
+            INSERT INTO midgard.message_function_code VALUES (284, 'Second representment reversal, partial');
+            INSERT INTO midgard.message_function_code VALUES (285, 'Third or subsequent representment reversal, partial');
+            INSERT INTO midgard.message_function_code VALUES (400, 'Full reversal, transaction did not complete as approved');
+            INSERT INTO midgard.message_function_code VALUES (401, 'Partial reversal, transaction did not complete for full amount');
+            INSERT INTO midgard.message_function_code VALUES (450, 'First chargeback, full');
+            INSERT INTO midgard.message_function_code VALUES (451, 'Second chargeback, full');
+            INSERT INTO midgard.message_function_code VALUES (452, 'Third or subsequent chargeback, full');
+            INSERT INTO midgard.message_function_code VALUES (453, 'First chargeback, partial');
+            INSERT INTO midgard.message_function_code VALUES (454, 'Second chargeback, partial');
+            INSERT INTO midgard.message_function_code VALUES (455, 'Third or subsequent chargeback, partial');
+            INSERT INTO midgard.message_function_code VALUES (456, 'Final chargeback, full amount');
+            INSERT INTO midgard.message_function_code VALUES (457, 'Final chargeback, partial amount');
+            INSERT INTO midgard.message_function_code VALUES (490, 'First chargeback reversal, full');
+            INSERT INTO midgard.message_function_code VALUES (491, 'Second chargeback reversal, full');
+            INSERT INTO midgard.message_function_code VALUES (492, 'Third or subsequent chargeback reversal');
+            INSERT INTO midgard.message_function_code VALUES (493, 'First chargeback reversal, partial');
+            INSERT INTO midgard.message_function_code VALUES (494, 'Second chargeback reversal, partial');
+            INSERT INTO midgard.message_function_code VALUES (495, 'Third or subsequent chargeback reversal, partial');
+            INSERT INTO midgard.message_function_code VALUES (600, 'Retrieval request');
+            INSERT INTO midgard.message_function_code VALUES (601, 'Original document repeat retrieval');
+            INSERT INTO midgard.message_function_code VALUES (602, 'Retrieval request response');
+            INSERT INTO midgard.message_function_code VALUES (613, 'Retrieval not fulfilled');
+            INSERT INTO midgard.message_function_code VALUES (640, 'Retrieval Request reversal');
+            INSERT INTO midgard.message_function_code VALUES (700, 'Fee Collection (Member-generated)');
+            INSERT INTO midgard.message_function_code VALUES (780, 'Fee Collection Return');
+            INSERT INTO midgard.message_function_code VALUES (781, 'Fee Collection Resubmission');
+            INSERT INTO midgard.message_function_code VALUES (782, 'Fee Collection Arbitration Return');
+            INSERT INTO midgard.message_function_code VALUES (783, 'Fee Collection (Clearing System-generated)');
+            INSERT INTO midgard.message_function_code VALUES (790, 'Fee Collection (Funds Transfer)');
+            INSERT INTO midgard.message_function_code VALUES (791, 'Fee Collection (Funds Transfer Backout)');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-msg-type-id-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="message_type_id">
+            <column name="id" type="int">
+                <constraints primaryKeyName="message_type_id_PK" primaryKey="true" />
+            </column>
+            <column name="message_type_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.message_type_id VALUES (1100, 'Online authorization');
+            INSERT INTO midgard.message_type_id VALUES (1120, 'Online authorization advice');
+            INSERT INTO midgard.message_type_id VALUES (1200, 'Online financial transaction');
+            INSERT INTO midgard.message_type_id VALUES (1220, 'Online financial advice ');
+            INSERT INTO midgard.message_type_id VALUES (1240, 'Presentment');
+            INSERT INTO midgard.message_type_id VALUES (1440, 'Reversal');
+            INSERT INTO midgard.message_type_id VALUES (1442, 'Chargeback');
+            INSERT INTO midgard.message_type_id VALUES (1644, 'Retrieval request');
+            INSERT INTO midgard.message_type_id VALUES (1740, 'Fee Collection');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-oper-env-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="operational_environment">
+            <column name="id" type="varchar(1)">
+                <constraints primaryKeyName="operational_environment_PK" primaryKey="true" />
+            </column>
+            <column name="operational_environment" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.operational_environment VALUES ('0', 'no terminal used');
+            INSERT INTO midgard.operational_environment VALUES ('1', 'on premises of card acceptor, attended');
+            INSERT INTO midgard.operational_environment VALUES ('2', 'on premises of card acceptor, unattended ');
+            INSERT INTO midgard.operational_environment VALUES ('3', 'off premises of card acceptor, attended');
+            INSERT INTO midgard.operational_environment VALUES ('4', 'off premises of card acceptor, unattended ');
+            INSERT INTO midgard.operational_environment VALUES ('5', 'on premises of cardholder, unattended');
+            INSERT INTO midgard.operational_environment VALUES ('6', 'off premises of cardholder, unattended');
+            INSERT INTO midgard.operational_environment VALUES ('M', 'Mobile Acceptance solution (mPOS)');
+            INSERT INTO midgard.operational_environment VALUES ('9', 'Unknown');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-pin-capt-cap-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="pin_capture_capability">
+            <column name="id" type="varchar(1)">
+                <constraints primaryKeyName="pin_capture_capability_PK" primaryKey="true" />
+            </column>
+            <column name="pin_capture_capability" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO midgard.pin_capture_capability VALUES ('0', 'No PIN capture capability');
+            INSERT INTO midgard.pin_capture_capability VALUES ('1', 'Unknown; data unavailable');
+            INSERT INTO midgard.pin_capture_capability VALUES ('4', 'PIN capture capability 4 characters maximum');
+            INSERT INTO midgard.pin_capture_capability VALUES ('5', 'PIN capture capability 5 characters maximum');
+            INSERT INTO midgard.pin_capture_capability VALUES ('6', 'PIN capture capability 6 characters maximum');
+            INSERT INTO midgard.pin_capture_capability VALUES ('7', 'PIN capture capability 7 characters maximum');
+            INSERT INTO midgard.pin_capture_capability VALUES ('8', 'PIN capture capability 8 characters maximum');
+            INSERT INTO midgard.pin_capture_capability VALUES ('9', 'PIN capture capability 9 characters maximum');
+            INSERT INTO midgard.pin_capture_capability VALUES ('A', 'PIN capture capability 10 characters maximum');
+            INSERT INTO midgard.pin_capture_capability VALUES ('B', 'PIN capture capability 11 characters maximum');
+            INSERT INTO midgard.pin_capture_capability VALUES ('C', 'PIN capture capability 12 characters maximum');
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-merchant-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="merchants">
+            <column name="merchant_id" type="varchar(15)">
+                <constraints primaryKeyName="merchants_PK" primaryKey="true" />
+            </column>
+            <column name="merchant_name" type="varchar(32)">
+                <constraints nullable="false" />
+            </column>
+            <column name="merchant_address" type="varchar(64)">
+                <constraints nullable="false" />
+            </column>
+            <column name="merchant_country" type="varchar(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="merchant_city" type="varchar(21)">
+                <constraints nullable="false" />
+            </column>
+            <column name="merchant_postal_code" type="varchar(10)" />
+        </createTable>
+        <createIndex tableName="merchants" indexName="merchant_id_idx">
+            <column name="merchant_id"></column>
+        </createIndex>
+    </changeSet>
+
+    <!-- Таблица с информацией по клиринговым транзакциям. По изначальной задумке, например,
+         chargeback'и будут в другой таблице. Все в одну таблицу слить не ок, так как сигнатура таблиц разнится -->
+    <changeSet id="1.0-base-create-tran-table" author="RBK.Money">
+        <createTable schemaName="midgard" tableName="clearing_transactions">
+            <column name="transaction_id" type="varchar(100)">
+                <constraints primaryKey="true" primaryKeyName="clearing_transaction_PK" />
+            </column>
+            <column name="transaction_date" type="datetime">
+                <constraints nullable="false" />
+            </column>
+            <column name="transaction_amount" type="decimal(18,4)">
+                <constraints nullable="false" checkConstraint=">=0"/>
+            </column>
+            <column name="transaction_currency" type="varchar(3)">
+                <constraints nullable="false" />
+            </column>
+            <column name="transaction_type" type="varchar(2)" remarks="The lookup table: transaction_type">
+                <constraints nullable="false" />
+            </column>
+            <column name="bank_name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="transaction_state" type="tinyint" remarks="The lookup table: transaction_state" />
+            <column name="account_type_from" type="tinyint" remarks="The lookup table: account_type" />
+            <column name="account_type_to" type="tinyint" remarks="The lookup table: account_type" />
+            <column name="card_capture_capability" type="varchar(1)" remarks="Possible values for the data element: 0 – None; 1 – Capture; 9 – Unknown." />
+            <column name="card_data_input_capability" type="varchar(1)" remarks="The lookup table: card_data_input_capability" />
+            <column name="card_data_input_mode" type="varchar(1)" remarks="The lookup table: card_data_input_capability" />
+            <column name="card_data_output_capability" type="varchar(1)" remarks="The lookup table: card_data_input_capability" />
+            <column name="card_presence" type="varchar(1)" remarks="Possible values for the data element: 0 - card not present, 1 - card present, 9 – Unknown" />
+            <column name="cardholder_auth_capability" type="varchar(1)" remarks="The lookup table: cardholder_auth_capability" />
+            <column name="cardholder_auth_entity" type="varchar(1)" remarks="The lookup table: cardholder_auth_entity" />
+            <column name="cardholder_auth_method" type="varchar(1)" remarks="The lookup table: cardholder_auth_method" />
+            <column name="cardholder_presence" type="varchar(1)" remarks="The lookup table: cardholder_presence" />
+            <column name="mcc" type="int" remarks="Merchant category code, also known as card acceptor business code – code classifying the type of business being done by the card acceptor for this transaction." />
+            <column name="merchant_id" type="varchar(15)" remarks="Code identifying the merchant" />
+            <column name="message_function_code" type="int" remarks="The lookup table: message_function_code" />
+            <column name="message_reason_code" type="int" remarks="The transmitted values must be according to procedure of the processing center used in the transaction - VISA, MC or Local center" />
+            <column name="message_type_identifier" type="int" remarks="The lookup table: message_type_id" />
+            <column name="operational_environment" type="varchar(1)" remarks="The lookup table: operational_environment" />
+            <column name="pin_capture_capability" type="varchar(1)" defaultValue="0" remarks="The lookup table: pin_capture_capability" />
+            <column name="terminal_data_output_capability" type="varchar(1)" remarks="The list of possible values: 0 -  Unknown; data unavailable, 1 -  None, 2 -  Printing capability only, 3 -  Display capability only, 4 -  Printing and display capability" />
+            <column name="terminal_id" type="varchar(8)" />
+        </createTable>
+        <createIndex tableName="clearing_transactions" indexName="clearing_transactions_id_idx">
+            <column name="transaction_id"></column>
+        </createIndex>
+        <createIndex tableName="clearing_transactions" indexName="clearing_transactions_date_idx">
+            <column name="transaction_date"></column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="1.0-base-create-encoding-tran-status-table" author="RBK.Money">
+        <createTable tableName="encoding_transaction_status">
+            <column name="id" type="tinyint">
+                <constraints primaryKey="true" primaryKeyName="encoding_transaction_status_PK" />
+            </column>
+            <column name="encoding_status_name" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+    
+    <changeSet id="1.0-base-create-encoding-tran-data-table" author="RBK.Money">
+        <createTable tableName="encoding_transaction_data">
+            <column name="clearing_id" type="bigint" remarks="Clearing id">
+                <constraints primaryKey="true" primaryKeyName="encoding_transaction_data_PK" />
+            </column>
+            <column name="date" type="datetime" remarks="Clearing date">
+                <constraints nullable="false" />
+            </column>
+            <column name="transaction_id" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="transaction_data" type="varchar(max)">
+                <constraints nullable="false" />
+            </column>
+            <column name="state" type="int" remarks="The lookup table: encoding_transaction_status" />
+        </createTable>
+        <createIndex tableName="encoding_transaction_data" indexName="encoding_transaction_data_idx">
+            <column name="clearing_id" />
+            <column name="transaction_id" />
+        </createIndex>
+        <createIndex tableName="encoding_transaction_data" indexName="encoding_transaction_data_date_idx">
+            <column name="date" />
+            <column name="clearing_id" />
+            <column name="transaction_id" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
