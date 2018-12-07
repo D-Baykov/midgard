@@ -21,16 +21,14 @@ import static org.jooq.generated.enums.ClearingState.*;
 import static org.jooq.generated.tables.ClearingEvent.CLEARING_EVENT;
 
 /**
- * DAO for working with clearing_event table
- *
- * @author d.baykov
- *         30.11.2018
+ * Класс для воаимодействия с таблицей clearing_event в базе данных.
+ * Данная таблица хранит информацию о клиринговых событиях, которые происходили в системе
  */
 public class ClearingInfoDAO extends AbstractGenericDao<ClearingEvent> {
 
-    /** Logger */
+    /** Логгер */
     private static final Logger log = LoggerFactory.getLogger(ClearingInfoDAO.class);
-    /** A list of merchant row */
+    /** Маппер */
     private final RowMapper<ClearingEvent> clearingEventsRowMapper;
 
     public ClearingInfoDAO(DataSource dataSource) {
@@ -59,10 +57,13 @@ public class ClearingInfoDAO extends AbstractGenericDao<ClearingEvent> {
         return clearingEvents;
     }
 
-    public Long getLastClearingId(Bank bank) {
-        return getLastClearingId(bank, Arrays.asList(STARTED, SUCCESSFULLY, FAILED));
-    }
-
+    /**
+     * Получение ID последнего клирингового эвента
+     *
+     * @param bank банк, для которого необходимо произвести поиск
+     * @param states список состояний, среди которого необходимо произвести поиск
+     * @return ID клирингового эвента
+     */
     public Long getLastClearingId(Bank bank, List<ClearingState> states) {
         Query query = getDslContext().selectFrom(CLEARING_EVENT)
                 .where((CLEARING_EVENT.BANK_NAME.eq(bank.name())).and(CLEARING_EVENT.STATE.in(states)))
@@ -72,6 +73,12 @@ public class ClearingInfoDAO extends AbstractGenericDao<ClearingEvent> {
         return event.getId();
     }
 
+    /**
+     * Обновление состояния для клирингового события
+     *
+     * @param clearingId ID клирингового события
+     * @param state состояние
+     */
     public void updateClearingState(Long clearingId, ClearingState state) {
         Query query = getDslContext().update(CLEARING_EVENT)
                 .set(CLEARING_EVENT.STATE, state)

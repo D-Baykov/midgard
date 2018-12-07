@@ -8,8 +8,16 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Утилитный класс для генерации объектов с использованием velocity */
 public final class VelocityUtil {
 
+    /**
+     * Создание списка объектов согласно заданному шаблону и контекстам
+     *
+     * @param templateDir шаблон
+     * @param contexts список контекстов
+     * @return список сгенерированных объектов
+     */
     public static List<String> create(String templateDir, List<VelocityContext> contexts) {
         VelocityEngine engine = getEngine();
         Template template = engine.getTemplate(templateDir);
@@ -21,6 +29,14 @@ public final class VelocityUtil {
         }
         return structures;
     }
+
+    /**
+     * Создание списка объектов согласно заданному шаблону и контексту
+     *
+     * @param templateDir шаблон
+     * @param context контекст
+     * @return сгенерированный объект
+     */
     public static String create(String templateDir, VelocityContext context) {
         VelocityEngine engine = getEngine();
         Template template = engine.getTemplate(templateDir);
@@ -29,6 +45,11 @@ public final class VelocityUtil {
         return writer.toString();
     }
 
+    /**
+     * Создание velocity движка
+     *
+     * @return экземпляр velocity engine
+     */
     private static VelocityEngine getEngine() {
         VelocityEngine engine = new VelocityEngine();
         engine.setProperty("resource.loader", "class");

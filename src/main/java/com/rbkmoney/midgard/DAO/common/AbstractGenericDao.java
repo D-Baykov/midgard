@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+/** Абстрактный класс для работы с базой данных */
 public abstract class AbstractGenericDao<T> extends NamedParameterJdbcDaoSupport implements DAO<T> {
 
     private final DSLContext dslContext;
@@ -191,12 +192,19 @@ public abstract class AbstractGenericDao<T> extends NamedParameterJdbcDaoSupport
         }
     }
 
+    /**
+     * Метод преобразовывает структуру JOOQ параметров в список параметров Spring
+     *
+     * @param params спосок jooq параметров
+     * @return возвращает spring структуру
+     */
     protected SqlParameterSource toSqlParameterSource(Map<String, Param<?>> params) {
         MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
         for (Map.Entry<String, Param<?>> entry : params.entrySet()) {
             Param<?> param = entry.getValue();
             if (param.getValue() instanceof String) {
-                sqlParameterSource.addValue(entry.getKey(), ((String) param.getValue()).replace("\u0000", "\\u0000"));
+                sqlParameterSource.addValue(entry.getKey(),
+                        ((String) param.getValue()).replace("\u0000", "\\u0000"));
             } else if (param.getValue() instanceof LocalDateTime || param.getValue() instanceof EnumType) {
                 sqlParameterSource.addValue(entry.getKey(), param.getValue(), Types.OTHER);
             } else {

@@ -17,13 +17,13 @@ import java.util.Optional;
 
 import static org.jooq.generated.tables.Config.CONFIG;
 
+/** Класс для взаимодействия с конфигурационной таблицей клиринга */
 public class ConfigDAO extends AbstractGenericDao<Config> {
 
-    /** Logger */
+    /** Логгер */
     private static final Logger log = LoggerFactory.getLogger(ConfigDAO.class);
-    /** A list of merchant row */
+    /** Маппер */
     private final RowMapper<Config> configRowMapper;
-
 
     public ConfigDAO(DataSource dataSource) {
         super(dataSource);
@@ -46,6 +46,11 @@ public class ConfigDAO extends AbstractGenericDao<Config> {
         return fetchOne(query, configRowMapper);
     }
 
+    /**
+     * Получение идентификатора последнего эвента полученного от внешней системы
+     *
+     * @return номер последнего эвента
+     */
     public Optional<Long> getLastEventId() {
         Config config = get("last_event_id");
         if (config != null) {

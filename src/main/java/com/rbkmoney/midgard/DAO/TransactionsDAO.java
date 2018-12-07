@@ -25,16 +25,17 @@ import static org.jooq.generated.tables.ClearingTransactionInfo.CLEARING_TRANSAC
 import static org.jooq.generated.tables.FailureTransaction.*;
 
 /**
- * DAO for work with clearing_transaction table
- *
- * @author d.baykov
- *         29.11.2018
+ * Класс для взаимодействия с транзакциями.
+ * clearing_transaction - в данной таблице хранится информация о транзакциях на основании которых необходимо
+ * сформировать клиринг
+ * failure_transaction - в данной таблице хранится информация о транзакциях, с которыми были проблемы в рамках клиринга
+ * clearing_transaction_info - в данной таблице хранится информация о транзакциях, которые попали в клиринговое событие
  */
 public class TransactionsDAO extends AbstractGenericDao<ClearingTransaction> {
 
-    /** Logger */
+    /** Логгер */
     private static final Logger log = LoggerFactory.getLogger(TransactionsDAO.class);
-    /** A list of merchant row */
+    /** Маппер */
     private final RowMapper<ClearingTransaction> transactionRowMapper;
 
     public TransactionsDAO(DataSource dataSource) {
@@ -62,6 +63,14 @@ public class TransactionsDAO extends AbstractGenericDao<ClearingTransaction> {
         return clearingTransaction;
     }
 
+    /**
+     * Получение списка клиринговых транзакций для определенного банка
+     *
+     * @param bank целевой банк
+     * @param dateTo дата, до которой необходимо получить список транзакций
+     * @param states список статусов транзакций, которые должны попасть в выборку
+     * @return список клиринговых транзакций
+     */
     public List<ClearingTransaction> getClearingTransactionsByBank(Bank bank,
                                                                    LocalDateTime dateTo,
                                                                    List<TransactionClearingState> states) {
@@ -72,6 +81,13 @@ public class TransactionsDAO extends AbstractGenericDao<ClearingTransaction> {
         return fetch(query, transactionRowMapper);
     }
 
+    /**
+     * Получить список клиринговых транзакции
+     *
+     * @param dateTo дата, до которой необходимо получить список транзакций
+     * @param states список статусов транзакций, которые должны попасть в выборку
+     * @return список клиринговых транзакций
+     */
     public List<ClearingTransaction> getClearingTransactions(LocalDateTime dateTo,
                                                              List<TransactionClearingState> states) {
         Query query = getDslContext().selectFrom(CLEARING_TRANSACTION)
@@ -80,39 +96,34 @@ public class TransactionsDAO extends AbstractGenericDao<ClearingTransaction> {
         return fetch(query, transactionRowMapper);
     }
 
-
+    /**
+     * Сохранить сбойную транзакцию
+     *
+     * @param failureTransaction сбойная транзакция
+     */
     public void saveFailureTransaction(FailureTransaction failureTransaction) {
         FailureTransactionRecord record = getDslContext().newRecord(FAILURE_TRANSACTION, failureTransaction);
         Query query = getDslContext().insertInto(FAILURE_TRANSACTION).set(record);
         execute(query);
     }
 
+    /**
+     * Сохранить информацию о транзакции попавшей в клиринговое событие
+     *
+     * @param transactionInfo информация о транзакции
+     */
     public void saveClearingTransactionInfo(ClearingTransactionInfo transactionInfo) {
         ClearingTransactionInfoRecord record = getDslContext().newRecord(CLEARING_TRANSACTION_INFO, transactionInfo);
         Query query = getDslContext().insertInto(CLEARING_TRANSACTION_INFO).set(record);
         execute(query);
     }
 
-
-    //TODO: так делать нельзя, потому что могли быть добавлены новые транзакции и в дальгейшем в выгрузку они не попадут
-//    public void setReadyActualClearingTransactions() {
-//        Query query = getDslContext().update(CLEARING_TRANSACTION)
-//                .set(CLEARING_TRANSACTION.TRANSACTION_CLEARING_STATE, READY)
-//                .where((CLEARING_TRANSACTION.TRANSACTION_DATE.lessOrEqual(LocalDateTime.now()))
-//                        .and(CLEARING_TRANSACTION.TRANSACTION_CLEARING_STATE.in(ACTIVE, FAILED)));
-//        execute(query);
-//    }
-
-
-
-    public void setClearingTransactionsState(List<ClearingTransaction> transactions, TransactionClearingState state) {
-        log.debug("Set clearing transactions to state {}", state);
-        for (ClearingTransaction transaction : transactions) {
-            setClearingTransactionState(transaction.getTransactionId(), state);
-        }
-        log.debug("The states of clearing transaction successful chenged to state {}", state);
-    }
-
+    /**
+     * Установить новое состояние для клиринговой транзакции
+     *
+     * @param transactionId идентификатор транзакции
+     * @param state состояние
+     */
     public void setClearingTransactionState(String transactionId, TransactionClearingState state) {
         log.trace("Set transaction {} to state {}", transactionId, state);
         Query query = getDslContext().update(CLEARING_TRANSACTION)
@@ -122,6 +133,13 @@ public class TransactionsDAO extends AbstractGenericDao<ClearingTransaction> {
         log.trace("The state of transacion {} successful chenged to state {}", transactionId, state);
     }
 
+    /**
+     * Обновить метаинформацию у коиринговой транзакции
+     *
+     * @param transactionId идентификатор транзакции
+     * @param clearingId идентификатор клирингового события
+     * @param state состояние
+     */
     public void setClearingTransactionMetaInfo(String transactionId,
                                                Long clearingId,
                                                TransactionClearingState state) {
@@ -134,6 +152,5 @@ public class TransactionsDAO extends AbstractGenericDao<ClearingTransaction> {
         execute(query);
         log.trace("The state of transacion {} successful chenged to state {}", transactionId, state);
     }
-
 
 }

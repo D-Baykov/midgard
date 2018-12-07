@@ -1,4 +1,4 @@
-package com.rbkmoney.midgard.pojos;
+package com.rbkmoney.midgard.data;
 
 import com.rbkmoney.midgard.data.enums.Bank;
 

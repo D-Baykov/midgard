@@ -321,8 +321,8 @@ CREATE TABLE midgard.clearing_transaction (
   payer_bank_card_masked_pan      CHARACTER VARYING             NULL,
   payer_bank_card_token_provider  CHARACTER VARYING             NULL,
   transaction_clearing_state      transaction_clearing_state    NOT NULL,
-  account_type_from               INTEGER                       NOT NULL,
-  account_type_to                 INTEGER                       NOT NULL,
+  account_type_from               VARCHAR(2)                    NOT NULL,
+  account_type_to                 VARCHAR(2)                    NOT NULL,
   approval_code                   VARCHAR(6)                    NULL,
   card_capture_capability         VARCHAR(1)                    NOT NULL,
   card_data_input_capability      VARCHAR(1)                    NOT NULL,
@@ -461,6 +461,9 @@ CREATE INDEX failure_transaction_idx ON midgard.failure_transaction (transaction
 
 
 /***************************************************************************/
+
+--//TODO: проверить актуальность тестовых данных
+
 /** TEST MERCHANT DATA */
 /*INSERT INTO midgard.merchants(merchant_id, merchant_name, merchant_address,
        merchant_country, merchant_city, merchant_postal_code, status, valid_from, valid_to)
@@ -470,7 +473,9 @@ VALUES ('29003001', '231285*EPS', 'address', '643', 'Moscow', '117112',
 
 
 /** TEST TRANSACTION DATA */
-/*INSERT INTO midgard.clearing_transactions( invoice_id, doc_id, transaction_id, transaction_date, transaction_amount,
+/*
+
+INSERT INTO midgard.clearing_transactions( invoice_id, doc_id, transaction_id, transaction_date, transaction_amount,
                                            transaction_currency, transaction_type, bank_name, payer_bank_card_token,
                                            payer_bank_card_payment_system, payer_bank_card_bin, payer_bank_card_masked_pan,
                                            payer_bank_card_token_provider, transaction_clearing_state, account_type_from,
@@ -489,6 +494,7 @@ VALUES ('inv_1', 'doc_1', 'tran_1', now(), 100000,
         '0', '0', '0', '5', null, '5734', '29003001',
         '200', '1508', '1100', null, null, null,
         '29003001', null, null, null)
+
 */
 
 

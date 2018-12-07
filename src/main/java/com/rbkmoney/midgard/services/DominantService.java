@@ -2,7 +2,6 @@ package com.rbkmoney.midgard.services;
 
 import com.rbkmoney.damsel.domain_config.Commit;
 import com.rbkmoney.damsel.domain_config.Operation;
-import com.rbkmoney.midgard.DAO.DominantDao;
 import com.rbkmoney.midgard.pollers.dominant.DominantHandler;
 import com.rbkmoney.midgard.utils.JsonUtil;
 import org.slf4j.Logger;
@@ -20,12 +19,9 @@ public class DominantService {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    //private final DominantDao dominantDao;
-
     private final List<DominantHandler> handlers;
 
-    public DominantService(/*DominantDao dominantDao,*/ List<DominantHandler> handlers) {
-        //this.dominantDao = dominantDao;
+    public DominantService(List<DominantHandler> handlers) {
         this.handlers = handlers;
     }
 
@@ -42,8 +38,8 @@ public class DominantService {
     }
 
     public Optional<Long> getLastVersionId() {
-        Optional<Long> lastVersionId =null;/*= Optional.ofNullable(dominantDao.getLastVersionId());
-        log.info("Last dominant versionId={}", lastVersionId);*/
+        Optional<Long> lastVersionId =null;
+
         return lastVersionId;
     }
 }

@@ -6,12 +6,7 @@ import org.jooq.generated.tables.pojos.ClearingTransaction;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * Utility class for working with clearing objects
- *
- * @author d.baykov
- *         29.11.2018
- */
+/** Utility class for working with clearing objects */
 public final class MidgardUtils {
 
     /** Cardholder “from” account type code. Value "00" means "Default – unspecified" */
@@ -114,6 +109,12 @@ public final class MidgardUtils {
         return true;
     }
 
+    /**
+     * Save file
+     *
+     * @param fileName file name
+     * @param value data
+     */
     public static final void saveToFile(String fileName, String value) throws IOException {
         FileUtils.writeStringToFile(new File(fileName), value);
     }

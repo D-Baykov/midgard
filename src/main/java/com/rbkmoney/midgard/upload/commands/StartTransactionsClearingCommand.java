@@ -1,34 +1,27 @@
 package com.rbkmoney.midgard.upload.commands;
 
 import com.rbkmoney.midgard.data.ClearingData;
-import com.rbkmoney.midgard.data.MtsXmlHeader;
 import com.rbkmoney.midgard.data.enums.Bank;
 import com.rbkmoney.midgard.helpers.ClearingInfoHelper;
 import com.rbkmoney.midgard.helpers.MerchantHelper;
 import com.rbkmoney.midgard.helpers.TransactionHelper;
-import com.rbkmoney.midgard.pojos.CardData;
-import com.rbkmoney.midgard.pojos.ClearingInstruction;
-import com.rbkmoney.midgard.utils.MidgardUtils;
-import com.rbkmoney.midgard.utils.MtsXmlUtil;
-import com.rbkmoney.midgard.utils.VelocityUtil;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.tools.generic.DateTool;
+import com.rbkmoney.midgard.data.ClearingInstruction;
 import org.jooq.generated.tables.pojos.ClearingTransaction;
 import org.jooq.generated.tables.pojos.Merchant;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/** Команда начала выполнения клиринга */
 public class StartTransactionsClearingCommand implements Command {
 
+    /** Инструкция к выполнению */
     private final ClearingInstruction instruction;
-
+    /** Вспомогательный класс для работы с транзакциями */
     private TransactionHelper transactionHelper;
-
+    /** Вспомогательный класс для работы с мерчантами */
     private MerchantHelper merchantHelper;
-
+    /** Вспомогательный класс для работы с метаинформацией */
     private ClearingInfoHelper clearingInfoHelper;
 
     public StartTransactionsClearingCommand(ClearingInstruction instruction,
@@ -71,6 +64,26 @@ public class StartTransactionsClearingCommand implements Command {
             }
         }
 
+        // сформировать объект для передачи в адаптер формирования XML клиринга
+        ClearingData clearingData = prepareClearingTransactions(transactions, failedTransactions, merchants, clearingId);
+
+        // отправить объект в адаптер
+        sendData(clearingData);
+    }
+
+    /**
+     * Подготовка клиринговых данных
+     *
+     * @param transactions список успешных клиринговых транзакций
+     * @param failedTransactions список неуспешных клиринговых транзакций
+     * @param merchants список мерчантов
+     * @param clearingId ID клирингового события
+     * @return объект клиринговых данных
+     */
+    private ClearingData prepareClearingTransactions(List<ClearingTransaction> transactions,
+                                                     List<ClearingTransaction> failedTransactions,
+                                                     List<Merchant> merchants,
+                                                     Long clearingId) {
         // записать список сбойных транзакций в таблицу failure_transaction
         String reason = "Для данной транзакции не был найден мерчант";
         transactionHelper.saveAllFailureTransactionByOneReason(failedTransactions, clearingId, reason);
@@ -84,58 +97,16 @@ public class StartTransactionsClearingCommand implements Command {
         // обновить статус клиринга
         clearingInfoHelper.setExecutedClearingEvent(clearingId);
 
-        // сформировать объект для передачи в адаптер формирования XML клиринга
-        ClearingData clearingData = new ClearingData(transactions, merchants);
-
-        // отправить объект в адаптер
-        sendData(clearingData);
-
-        createXml(clearingData);
+        return new ClearingData(transactions, merchants);
     }
 
+    /**
+     * Передача клиринговых данных в адаптер
+     *
+     * @param clearingData клиринговые данные
+     */
     private void sendData(ClearingData clearingData) {
         //TODO: отправка данных в адаптер формирования XML
-    }
-
-    //
-    private void createXml(ClearingData clearingData) {
-        String fileOriginator = "fileOriginator";
-        int fileNumber = 1;
-        MtsXmlHeader header = new MtsXmlHeader(fileOriginator, fileNumber);
-        VelocityContext headerContext = new VelocityContext();
-        headerContext.put("header", header);
-        String clearingXmlHeader = VelocityUtil.create("vm/header.vm", headerContext);
-
-
-        DateTool dateTool = new DateTool();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        String procDate = dateFormat.format(new Date());
-        String msgNr = UUID.randomUUID().toString();
-        List<ClearingTransaction> transactions = clearingData.getTransactions();
-        List<Merchant> merchants = clearingData.getMerchants();
-
-        List<VelocityContext> transactionsContext = new ArrayList<>();
-        for (ClearingTransaction transaction : transactions) {
-            VelocityContext context = new VelocityContext();
-            CardData cardData = new CardData();
-            context.put("dateTool", dateTool);
-            context.put("procDate", procDate);
-            context.put("msgNr", msgNr);
-            context.put("cardData", cardData);
-            context.put("transaction", transaction);
-            Merchant merchant = merchants.stream()
-                    .filter(mrch -> mrch.getMerchantId().equals(transaction.getMerchantId()))
-                    .findFirst().orElse(new Merchant());
-            context.put("merchant", merchant);
-            transactionsContext.add(context);
-        }
-        List<String> trxXmlBlocks = VelocityUtil.create("vm/transaction.vm", transactionsContext);
-
-        try {
-            MidgardUtils.saveToFile("clearing.xml", MtsXmlUtil.createXML(clearingXmlHeader, trxXmlBlocks));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
 

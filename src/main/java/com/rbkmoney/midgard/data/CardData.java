@@ -1,10 +1,7 @@
-package com.rbkmoney.midgard.pojos;
+package com.rbkmoney.midgard.data;
 
-/**
- * Class containing card data
- *
- * @author d.baykov
- */
+/** Class containing card data */
+//TODO: переедет в адаптер
 public class CardData {
 
     private String pan;

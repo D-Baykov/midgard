@@ -1,6 +1,6 @@
 #* @vtlvariable name="transaction" type="org.jooq.generated.tables.pojos.ClearingTransaction" *#
 #* @vtlvariable name="merchant" type="org.jooq.generated.tables.pojos.Merchant" *#
-#* @vtlvariable name="cardData" type="com.rbkmoney.midgard.pojos.CardData" *#
+#* @vtlvariable name="cardData" type="com.rbkmoney.midgard.data.CardData" *#
 <Transaction>
     <ApprCode></ApprCode>                                                             <!-- Необходимо доработать -->
     <CardCaptureCap>$transaction.cardCaptureCapability</CardCaptureCap>

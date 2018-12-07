@@ -8,23 +8,23 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.util.List;
 
-/**
- * A helper for work with merchants
- *
- * @author d.baykov
- *         29.11.2018
- */
+/** Вспомогательный класс для работы с таблицей мерчантов */
 public class MerchantHelper {
 
-    /** Logger */
+    /** Логгер */
     private static final Logger log = LoggerFactory.getLogger(MerchantHelper.class);
-    /**  */
+    /** Объект для работы с данными в БД */
     private final MerchantDAO dao;
 
     public MerchantHelper(DataSource dataSource) {
         dao = new MerchantDAO(dataSource);
     }
 
+    /**
+     * Сохранение списка мерчантов
+     *
+     * @param merchants список мерачнтов
+     */
     public void saveMerchants(List<Merchant> merchants) {
         merchants.stream().forEach(this::saveMerchant);
     }

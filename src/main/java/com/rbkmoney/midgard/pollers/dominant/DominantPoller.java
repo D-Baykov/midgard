@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+//TODO: копипаста из newway. Пока не ясно потребуется ли, но скорей всего будет нужно, чтобы поднянуть данные о мерчант ID
 @Component
 @DependsOn("dbInitializer")
 public class DominantPoller {

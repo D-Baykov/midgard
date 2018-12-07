@@ -5,10 +5,12 @@ import org.jooq.generated.tables.pojos.Merchant;
 
 import java.util.List;
 
+/** Класс, содержащий данные, которые необходимые для формирования клирингового файла */
 public class ClearingData {
 
+    /** Список клиринговых транзакций */
     private List<ClearingTransaction> transactions;
-
+    /** Список мерчантов */
     private List<Merchant> merchants;
 
     public ClearingData(List<ClearingTransaction> transactions, List<Merchant> merchants) {
@@ -22,5 +24,13 @@ public class ClearingData {
 
     public List<Merchant> getMerchants() {
         return merchants;
+    }
+
+    @Override
+    public String toString() {
+        return "ClearingData{" +
+                "transactions=" + transactions +
+                ", merchants=" + merchants +
+                '}';
     }
 }

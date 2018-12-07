@@ -5,6 +5,7 @@ import com.rbkmoney.eventstock.client.EventConstraint;
 import com.rbkmoney.eventstock.client.EventPublisher;
 import com.rbkmoney.eventstock.client.SubscriberConfig;
 import com.rbkmoney.eventstock.client.poll.EventFlowFilter;
+import com.rbkmoney.midgard.services.InvoicingService;
 import com.rbkmoney.midgard.services.PartyManagementService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -18,21 +19,33 @@ public class OnStartListener implements ApplicationListener<ApplicationReadyEven
 
     private final EventPublisher partyManagementEventPublisher;
 
+    private final EventPublisher invoicingEventPublisher;
+
     private final PartyManagementService partyManagementService;
+
+    private final InvoicingService invoicingService;
 
     @Value("${bm.pollingEnabled}")
     private boolean pollingEnabled;
 
     public OnStartListener(EventPublisher partyManagementEventPublisher,
-                           PartyManagementService partyManagementService) {
+                           EventPublisher invoicingEventPublisher,
+
+                           PartyManagementService partyManagementService,
+                           InvoicingService invoicingService) {
         this.partyManagementEventPublisher = partyManagementEventPublisher;
+        this.invoicingEventPublisher = invoicingEventPublisher;
+
         this.partyManagementService = partyManagementService;
+        this.invoicingService = invoicingService;
     }
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         if (pollingEnabled) {
-            partyManagementEventPublisher.subscribe(buildSubscriberConfig(partyManagementService.getLastEventId()));
+            //TODO: Заготовка для дальнейшей возможной реализации пулинга из эвентов
+            //partyManagementEventPublisher.subscribe(buildSubscriberConfig(partyManagementService.getLastEventId()));
+            //invoicingEventPublisher.subscribe(buildSubscriberConfig(invoicingService.getLastEventId()));
         }
     }
 

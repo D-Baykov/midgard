@@ -11,7 +11,7 @@ spring:
       idle-timeout: 30000
       maximum-pool-size: 3
   flyway:
-    schemas: midgard
+    schemas: @db.schema@
 
 retry-policy:
   maxAttempts: 10

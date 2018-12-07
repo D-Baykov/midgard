@@ -1,19 +1,75 @@
 package com.rbkmoney.midgard.utils;
 
+import com.rbkmoney.midgard.data.ClearingData;
+import com.rbkmoney.midgard.data.MtsXmlHeader;
+import com.rbkmoney.midgard.data.CardData;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.tools.generic.DateTool;
 import org.jooq.generated.tables.pojos.ClearingTransaction;
+import org.jooq.generated.tables.pojos.Merchant;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class MtsXmlUtil {
 
     private static final String VERSION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 
+    /**
+     * Создание итогового клирингового XML
+     *
+     * @param clearingData клиринговые данные
+     * @return строку со сформированным документом
+     * TODO: это предварительная версия. В конечном счете файл будет формироваться по частям
+     */
+    public static String createXml(ClearingData clearingData) {
+        String fileOriginator = "fileOriginator";
+        int fileNumber = 1;
+        MtsXmlHeader header = new MtsXmlHeader(fileOriginator, fileNumber);
+        VelocityContext headerContext = new VelocityContext();
+        headerContext.put("header", header);
+        String clearingXmlHeader = VelocityUtil.create("vm/header.vm", headerContext);
+
+
+        DateTool dateTool = new DateTool();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        String procDate = dateFormat.format(new Date());
+        String msgNr = UUID.randomUUID().toString();
+        List<ClearingTransaction> transactions = clearingData.getTransactions();
+        List<Merchant> merchants = clearingData.getMerchants();
+
+        List<VelocityContext> transactionsContext = new ArrayList<>();
+        for (ClearingTransaction transaction : transactions) {
+            VelocityContext context = new VelocityContext();
+            CardData cardData = new CardData();
+            context.put("dateTool", dateTool);
+            context.put("procDate", procDate);
+            context.put("msgNr", msgNr);
+            context.put("cardData", cardData);
+            context.put("transaction", transaction);
+            Merchant merchant = merchants.stream()
+                    .filter(mrch -> mrch.getMerchantId().equals(transaction.getMerchantId()))
+                    .findFirst().orElse(new Merchant());
+            context.put("merchant", merchant);
+            transactionsContext.add(context);
+        }
+        List<String> trxXmlBlocks = VelocityUtil.create("vm/transaction.vm", transactionsContext);
+
+        return MtsXmlUtil.createXML(clearingXmlHeader, trxXmlBlocks);
+
+
+    }
+
+    //TODO: зашлушка. В рамках финального адаптера будет сделано иначе
     public static String createXML(String header, List<String> transactions) {
         StringBuilder builder = new StringBuilder();
         builder.append(VERSION);
@@ -25,36 +81,6 @@ public final class MtsXmlUtil {
         builder.append("</Transactions>\n");
         builder.append("</File>\n");
         return builder.toString();
-    }
-
-
-    public static Document createTransactionXmlByDOM(ClearingTransaction transaction)
-            throws ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db  = dbf.newDocumentBuilder();
-        Document doc = db.newDocument();
-
-        Element root = doc.createElement("Transaction");
-
-        Element apprCode = doc.createElement("ApprCode");
-        //TODO: добавить в таблицы. Copy from Auth response' FLD_038
-        apprCode.setTextContent("");
-        root.appendChild(apprCode);
-
-        Element cardCaptureCap = doc.createElement("CardCaptureCap");
-        cardCaptureCap.setTextContent(transaction.getCardCaptureCapability());
-        root.appendChild(cardCaptureCap);
-
-        Element cardDataInputCap = doc.createElement("CardDataInputCap");
-        cardDataInputCap.setTextContent(transaction.getCardDataInputCapability());
-        root.appendChild(cardDataInputCap);
-
-        Element cardDataInputMode = doc.createElement("CardDataInputMode");
-        cardDataInputMode.setTextContent(transaction.getCardDataInputMode());
-        root.appendChild(cardDataInputMode);
-
-        doc.appendChild(root);
-        return doc;
     }
 
     private MtsXmlUtil() {}

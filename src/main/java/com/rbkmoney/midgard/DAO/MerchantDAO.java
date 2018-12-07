@@ -19,19 +19,16 @@ import static org.jooq.generated.enums.MerchantState.*;
 import static org.jooq.generated.tables.Merchant.MERCHANT;
 
 /**
- * DAO for work with merchant table
- *
- * @author d.baykov
- *         29.11.2018
+ * Класс для взаимодействия с таблицей merchant.
+ * В данной таблице хранится информация о точках, в которых была инициирована транзакция
  */
 public class MerchantDAO extends AbstractGenericDao<Merchant> {
 
-    /** Logger */
+    /** Логгер */
     private static final Logger log = LoggerFactory.getLogger(MerchantDAO.class);
-    /** A list of merchant row */
+    /** Маппер */
     private final RowMapper<Merchant> merchantRowMapper;
 
-    @Autowired
     public MerchantDAO(DataSource dataSource) {
         super(dataSource);
         merchantRowMapper = new RecordRowMapper<>(MERCHANT, Merchant.class);
@@ -42,7 +39,7 @@ public class MerchantDAO extends AbstractGenericDao<Merchant> {
         log.debug("Adding new merchant: {}", merchant);
         MerchantRecord record = getDslContext().newRecord(MERCHANT, merchant);
         Query query = getDslContext().insertInto(MERCHANT).set(record);
-        int addedRows = execute(query);
+        execute(query);
         log.debug("New merchant with id {} was added", merchant.getMerchantId());
         return 0L;
     }
@@ -58,9 +55,9 @@ public class MerchantDAO extends AbstractGenericDao<Merchant> {
     }
 
     /**
+     * Закрытие версии мерчанта. Используется в ситуациях, когда пришли обновленные данные
      *
-     *
-     * @param merchantId
+     * @param merchantId идентификатор мерчанта
      */
     public void closeMerchant(String merchantId) throws DaoException {
         log.debug("Closing a merchant with id {}", merchantId);
@@ -73,10 +70,10 @@ public class MerchantDAO extends AbstractGenericDao<Merchant> {
     }
 
     /**
+     * Получение истории изменений по мерчанту
      *
-     *
-     * @param merchantId
-     * @return
+     * @param merchantId идентификатор мерчанта
+     * @return список изменений по мерчанту
      */
     public List<Merchant> getMerchantHistory(String merchantId) {
         Query query = getDslContext().selectFrom(MERCHANT)

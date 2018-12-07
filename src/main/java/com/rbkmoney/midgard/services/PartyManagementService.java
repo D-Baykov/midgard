@@ -18,12 +18,9 @@ public class PartyManagementService implements EventService<Event, EventPayload>
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-//    private final PartyDao partyDao;
-
     private final List<AbstractPartyManagementServiceHandler> partyManagementHandlers;
 
-    public PartyManagementService(/*PartyDao partyDao,*/ List<AbstractPartyManagementServiceHandler> partyManagementHandlers) {
-        //this.partyDao = partyDao;
+    public PartyManagementService(List<AbstractPartyManagementServiceHandler> partyManagementHandlers) {
         this.partyManagementHandlers = partyManagementHandlers;
     }
 

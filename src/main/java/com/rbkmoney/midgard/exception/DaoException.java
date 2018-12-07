@@ -1,6 +1,7 @@
 package com.rbkmoney.midgard.exception;
 
 public class DaoException extends RuntimeException {
+
     public DaoException() {
         super();
     }
@@ -20,4 +21,5 @@ public class DaoException extends RuntimeException {
     protected DaoException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
+
 }

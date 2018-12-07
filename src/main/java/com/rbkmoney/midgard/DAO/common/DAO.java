@@ -10,9 +10,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import java.util.List;
 
 /**
- * Basical DAO interface
+ * Инфтерфейс для работы с БД
  *
- * @param <T> type for interaction with the database
+ * @param <T> тип для взаимодействия с БД
  */
 public interface DAO<T> {
 
